@@ -1,0 +1,55 @@
+"""
+Configuracion central del proyecto Asistente Robotico por Comandos de Voz.
+Modalidad C: Panel de Domotica Controlada por Voz.
+"""
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+AUDIO_DIR = PROJECT_ROOT / "Audios"
+DATA_DIR = PROJECT_ROOT / "data"
+PROCESSED_DIR = DATA_DIR / "processed"
+MODELS_DIR = PROJECT_ROOT / "models"
+
+SAMPLE_RATE = 16000
+CLIP_DURATION_S = 1.5
+CLIP_SAMPLES = int(SAMPLE_RATE * CLIP_DURATION_S)
+
+N_MFCC = 40
+N_FFT = 512
+WIN_LENGTH_MS = 25
+HOP_LENGTH_MS = 10
+WIN_LENGTH = int(SAMPLE_RATE * WIN_LENGTH_MS / 1000)
+HOP_LENGTH = int(SAMPLE_RATE * HOP_LENGTH_MS / 1000)
+N_MELS = 64
+FMIN = 20
+FMAX = 8000
+
+VAD_FRAME_MS = 30
+VAD_HOP_MS = 10
+VAD_ENERGY_PERCENTILE = 30
+VAD_PAD_MS = 100
+
+CLASSES = [
+    "APAGA",
+    "CERRADURA",
+    "ENCIENDE",
+    "LUZ",
+    "PANEL",
+    "RUIDO",
+    "VENTILADOR",
+]
+LABEL_TO_INDEX = {c: i for i, c in enumerate(CLASSES)}
+INDEX_TO_LABEL = {i: c for i, c in enumerate(CLASSES)}
+NUM_CLASSES = len(CLASSES)
+
+VAL_FRACTION = 0.15
+TEST_FRACTION = 0.15
+RANDOM_SEED = 42
+
+AUG_PER_SAMPLE = 3
+NOISE_SNR_DB_RANGE = (5, 20)
+TIME_SHIFT_MAX_MS = 200
+PITCH_SHIFT_SEMITONES_RANGE = (-2.0, 2.0)
+SPECAUG_TIME_MASK_MAX = 20
+SPECAUG_FREQ_MASK_MAX = 8
+SPECAUG_N_MASKS = 2

@@ -1,0 +1,9 @@
+numpy>=1.26
+scipy>=1.11
+librosa>=0.10.2
+soundfile>=0.12
+scikit-learn>=1.4
+matplotlib>=3.8
+tqdm>=4.66
+tensorflow>=2.19
+jupyter>=1.0

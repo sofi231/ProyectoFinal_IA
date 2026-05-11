@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+data/processed/*.npz
+data/processed/*.meta.json
+models/*.h5
+models/*.tflite
+models/*.onnx
+models/*.pt
+.DS_Store
+Audios
