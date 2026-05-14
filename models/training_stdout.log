@@ -1,0 +1,536 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778636035.083555   14556 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778636039.851241   14556 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+[1/5] Cargando dataset desde C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\data\processed\dataset.npz ...
+      train=(2520, 120, 151)  val=(136, 120, 151)  test=(136, 120, 151)
+      clases: ['APAGA', 'CERRADURA', 'ENCIENDE', 'LUZ', 'PANEL', 'RUIDO', 'VENTILADOR']
+
+[2/5] Construyendo modelo (input=(120, 151)) ...
+I0000 00:00:1778636045.371805   14556 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+Model: "cnn_voz_base"
++--------------------------------------------------------------------------+
+| Layer (type)                    | Output Shape           |       Param # |
+|---------------------------------+------------------------+---------------|
+| mfcc_input (InputLayer)         | (None, 120, 151)       |             0 |
+|---------------------------------+------------------------+---------------|
+| add_channel (Reshape)           | (None, 120, 151, 1)    |             0 |
+|---------------------------------+------------------------+---------------|
+| conv1 (Conv2D)                  | (None, 120, 151, 32)   |           320 |
+|---------------------------------+------------------------+---------------|
+| bn1 (BatchNormalization)        | (None, 120, 151, 32)   |           128 |
+|---------------------------------+------------------------+---------------|
+| relu1 (ReLU)                    | (None, 120, 151, 32)   |             0 |
+|---------------------------------+------------------------+---------------|
+| pool1 (MaxPooling2D)            | (None, 60, 75, 32)     |             0 |
+|---------------------------------+------------------------+---------------|
+| drop1 (Dropout)                 | (None, 60, 75, 32)     |             0 |
+|---------------------------------+------------------------+---------------|
+| conv2 (Conv2D)                  | (None, 60, 75, 64)     |        18,496 |
+|---------------------------------+------------------------+---------------|
+| bn2 (BatchNormalization)        | (None, 60, 75, 64)     |           256 |
+|---------------------------------+------------------------+---------------|
+| relu2 (ReLU)                    | (None, 60, 75, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| pool2 (MaxPooling2D)            | (None, 30, 37, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| drop2 (Dropout)                 | (None, 30, 37, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| conv3 (Conv2D)                  | (None, 30, 37, 64)     |        36,928 |
+|---------------------------------+------------------------+---------------|
+| bn3 (BatchNormalization)        | (None, 30, 37, 64)     |           256 |
+|---------------------------------+------------------------+---------------|
+| relu3 (ReLU)                    | (None, 30, 37, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| pool3 (MaxPooling2D)            | (None, 15, 18, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| drop3 (Dropout)                 | (None, 15, 18, 64)     |             0 |
+|---------------------------------+------------------------+---------------|
+| gap (GlobalAveragePooling2D)    | (None, 64)             |             0 |
+|---------------------------------+------------------------+---------------|
+| dense1 (Dense)                  | (None, 64)             |         4,160 |
+|---------------------------------+------------------------+---------------|
+| bn_head (BatchNormalization)    | (None, 64)             |           256 |
+|---------------------------------+------------------------+---------------|
+| relu_head (ReLU)                | (None, 64)             |             0 |
+|---------------------------------+------------------------+---------------|
+| drop_head (Dropout)             | (None, 64)             |             0 |
+|---------------------------------+------------------------+---------------|
+| softmax (Dense)                 | (None, 7)              |           455 |
++--------------------------------------------------------------------------+
+ Total params: 61,255 (239.28 KB)
+ Trainable params: 60,807 (237.53 KB)
+ Non-trainable params: 448 (1.75 KB)
+
+
+Pesos de clase: {0: 0.8910891089108911, 1: 0.8910891089108911, 2: 0.9, 3: 0.9, 4: 0.9, 5: 3.2142857142857144, 6: 0.9}
+
+[3/5] Entrenando hasta 120 epocas (batch=32) ...
+Epoch 1/120
+
+Epoch 1: val_loss improved from None to 1.91519, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 1: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 234s - 3s/step - accuracy: 0.2067 - loss: 2.1750 - val_accuracy: 0.1618 - val_loss: 1.9152 - learning_rate: 5.0000e-04
+Epoch 2/120
+
+Epoch 2: val_loss improved from 1.91519 to 1.90716, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 2: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 205s - 3s/step - accuracy: 0.2690 - loss: 1.8773 - val_accuracy: 0.1985 - val_loss: 1.9072 - learning_rate: 5.0000e-04
+Epoch 3/120
+
+Epoch 3: val_loss improved from 1.90716 to 1.70608, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 3: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 102s - 1s/step - accuracy: 0.2825 - loss: 1.7661 - val_accuracy: 0.3603 - val_loss: 1.7061 - learning_rate: 5.0000e-04
+Epoch 4/120
+
+Epoch 4: val_loss did not improve from 1.70608
+79/79 - 195s - 2s/step - accuracy: 0.3341 - loss: 1.6456 - val_accuracy: 0.2206 - val_loss: 1.8619 - learning_rate: 5.0000e-04
+Epoch 5/120
+
+Epoch 5: val_loss improved from 1.70608 to 1.60298, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 5: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 100s - 1s/step - accuracy: 0.3714 - loss: 1.5474 - val_accuracy: 0.2794 - val_loss: 1.6030 - learning_rate: 5.0000e-04
+Epoch 6/120
+
+Epoch 6: val_loss did not improve from 1.60298
+79/79 - 132s - 2s/step - accuracy: 0.4262 - loss: 1.4596 - val_accuracy: 0.2353 - val_loss: 2.0461 - learning_rate: 5.0000e-04
+Epoch 7/120
+
+Epoch 7: val_loss did not improve from 1.60298
+79/79 - 143s - 2s/step - accuracy: 0.4567 - loss: 1.3764 - val_accuracy: 0.2721 - val_loss: 1.8948 - learning_rate: 5.0000e-04
+Epoch 8/120
+
+Epoch 8: val_loss did not improve from 1.60298
+79/79 - 112s - 1s/step - accuracy: 0.5044 - loss: 1.2970 - val_accuracy: 0.4265 - val_loss: 2.4384 - learning_rate: 5.0000e-04
+Epoch 9/120
+
+Epoch 9: val_loss did not improve from 1.60298
+79/79 - 31s - 396ms/step - accuracy: 0.5381 - loss: 1.2094 - val_accuracy: 0.3015 - val_loss: 4.1410 - learning_rate: 5.0000e-04
+Epoch 10/120
+
+Epoch 10: val_loss did not improve from 1.60298
+79/79 - 30s - 384ms/step - accuracy: 0.5702 - loss: 1.1521 - val_accuracy: 0.3088 - val_loss: 3.0606 - learning_rate: 5.0000e-04
+Epoch 11/120
+
+Epoch 11: val_loss did not improve from 1.60298
+79/79 - 31s - 387ms/step - accuracy: 0.6060 - loss: 1.0848 - val_accuracy: 0.3456 - val_loss: 2.8147 - learning_rate: 5.0000e-04
+Epoch 12/120
+
+Epoch 12: val_loss improved from 1.60298 to 1.55305, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 12: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 33s - 416ms/step - accuracy: 0.6238 - loss: 1.0209 - val_accuracy: 0.5515 - val_loss: 1.5530 - learning_rate: 5.0000e-04
+Epoch 13/120
+
+Epoch 13: val_loss improved from 1.55305 to 1.52425, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 13: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 32s - 402ms/step - accuracy: 0.6381 - loss: 0.9834 - val_accuracy: 0.5441 - val_loss: 1.5242 - learning_rate: 5.0000e-04
+Epoch 14/120
+
+Epoch 14: val_loss did not improve from 1.52425
+79/79 - 32s - 408ms/step - accuracy: 0.6619 - loss: 0.9628 - val_accuracy: 0.3382 - val_loss: 2.8700 - learning_rate: 5.0000e-04
+Epoch 15/120
+
+Epoch 15: val_loss improved from 1.52425 to 1.48308, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 15: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 73s - 930ms/step - accuracy: 0.6560 - loss: 0.9317 - val_accuracy: 0.5662 - val_loss: 1.4831 - learning_rate: 5.0000e-04
+Epoch 16/120
+
+Epoch 16: val_loss did not improve from 1.48308
+79/79 - 32s - 411ms/step - accuracy: 0.7012 - loss: 0.8416 - val_accuracy: 0.3088 - val_loss: 2.6889 - learning_rate: 5.0000e-04
+Epoch 17/120
+
+Epoch 17: val_loss did not improve from 1.48308
+79/79 - 33s - 412ms/step - accuracy: 0.7087 - loss: 0.8233 - val_accuracy: 0.1912 - val_loss: 3.1848 - learning_rate: 5.0000e-04
+Epoch 18/120
+
+Epoch 18: val_loss did not improve from 1.48308
+79/79 - 33s - 417ms/step - accuracy: 0.7202 - loss: 0.7919 - val_accuracy: 0.4265 - val_loss: 3.0321 - learning_rate: 5.0000e-04
+Epoch 19/120
+
+Epoch 19: val_loss did not improve from 1.48308
+79/79 - 33s - 423ms/step - accuracy: 0.7187 - loss: 0.7811 - val_accuracy: 0.4338 - val_loss: 3.4753 - learning_rate: 5.0000e-04
+Epoch 20/120
+
+Epoch 20: val_loss did not improve from 1.48308
+79/79 - 34s - 428ms/step - accuracy: 0.7417 - loss: 0.7468 - val_accuracy: 0.4926 - val_loss: 2.3719 - learning_rate: 5.0000e-04
+Epoch 21/120
+
+Epoch 21: val_loss did not improve from 1.48308
+79/79 - 34s - 435ms/step - accuracy: 0.7496 - loss: 0.7062 - val_accuracy: 0.5368 - val_loss: 1.8020 - learning_rate: 5.0000e-04
+Epoch 22/120
+
+Epoch 22: val_loss did not improve from 1.48308
+
+Epoch 22: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.
+79/79 - 34s - 433ms/step - accuracy: 0.7619 - loss: 0.6874 - val_accuracy: 0.4044 - val_loss: 2.7515 - learning_rate: 5.0000e-04
+Epoch 23/120
+
+Epoch 23: val_loss did not improve from 1.48308
+79/79 - 75s - 954ms/step - accuracy: 0.7754 - loss: 0.6462 - val_accuracy: 0.3529 - val_loss: 3.3128 - learning_rate: 2.5000e-04
+Epoch 24/120
+
+Epoch 24: val_loss improved from 1.48308 to 0.94365, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 24: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 108s - 1s/step - accuracy: 0.7845 - loss: 0.6288 - val_accuracy: 0.6691 - val_loss: 0.9436 - learning_rate: 2.5000e-04
+Epoch 25/120
+
+Epoch 25: val_loss did not improve from 0.94365
+79/79 - 112s - 1s/step - accuracy: 0.7881 - loss: 0.5989 - val_accuracy: 0.5515 - val_loss: 1.8726 - learning_rate: 2.5000e-04
+Epoch 26/120
+
+Epoch 26: val_loss did not improve from 0.94365
+79/79 - 69s - 872ms/step - accuracy: 0.8020 - loss: 0.5964 - val_accuracy: 0.5662 - val_loss: 1.1957 - learning_rate: 2.5000e-04
+Epoch 27/120
+
+Epoch 27: val_loss did not improve from 0.94365
+79/79 - 87s - 1s/step - accuracy: 0.8075 - loss: 0.5902 - val_accuracy: 0.6618 - val_loss: 1.1812 - learning_rate: 2.5000e-04
+Epoch 28/120
+
+Epoch 28: val_loss did not improve from 0.94365
+79/79 - 133s - 2s/step - accuracy: 0.8115 - loss: 0.5733 - val_accuracy: 0.6176 - val_loss: 1.5367 - learning_rate: 2.5000e-04
+Epoch 29/120
+
+Epoch 29: val_loss did not improve from 0.94365
+79/79 - 130s - 2s/step - accuracy: 0.8032 - loss: 0.5760 - val_accuracy: 0.4118 - val_loss: 2.6029 - learning_rate: 2.5000e-04
+Epoch 30/120
+
+Epoch 30: val_loss did not improve from 0.94365
+79/79 - 131s - 2s/step - accuracy: 0.8115 - loss: 0.5504 - val_accuracy: 0.4926 - val_loss: 2.1351 - learning_rate: 2.5000e-04
+Epoch 31/120
+
+Epoch 31: val_loss improved from 0.94365 to 0.56701, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 31: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 424s - 5s/step - accuracy: 0.8143 - loss: 0.5492 - val_accuracy: 0.7868 - val_loss: 0.5670 - learning_rate: 2.5000e-04
+Epoch 32/120
+
+Epoch 32: val_loss did not improve from 0.56701
+79/79 - 30s - 381ms/step - accuracy: 0.8056 - loss: 0.5590 - val_accuracy: 0.6691 - val_loss: 1.2433 - learning_rate: 2.5000e-04
+Epoch 33/120
+
+Epoch 33: val_loss did not improve from 0.56701
+79/79 - 30s - 374ms/step - accuracy: 0.8155 - loss: 0.5427 - val_accuracy: 0.6544 - val_loss: 1.0789 - learning_rate: 2.5000e-04
+Epoch 34/120
+
+Epoch 34: val_loss did not improve from 0.56701
+79/79 - 30s - 374ms/step - accuracy: 0.8167 - loss: 0.5444 - val_accuracy: 0.7426 - val_loss: 0.9220 - learning_rate: 2.5000e-04
+Epoch 35/120
+
+Epoch 35: val_loss did not improve from 0.56701
+79/79 - 30s - 378ms/step - accuracy: 0.8325 - loss: 0.5122 - val_accuracy: 0.5956 - val_loss: 1.3151 - learning_rate: 2.5000e-04
+Epoch 36/120
+
+Epoch 36: val_loss did not improve from 0.56701
+79/79 - 30s - 376ms/step - accuracy: 0.8194 - loss: 0.5285 - val_accuracy: 0.7941 - val_loss: 0.6638 - learning_rate: 2.5000e-04
+Epoch 37/120
+
+Epoch 37: val_loss did not improve from 0.56701
+79/79 - 30s - 380ms/step - accuracy: 0.8377 - loss: 0.4994 - val_accuracy: 0.5368 - val_loss: 1.7663 - learning_rate: 2.5000e-04
+Epoch 38/120
+
+Epoch 38: val_loss did not improve from 0.56701
+
+Epoch 38: ReduceLROnPlateau reducing learning rate to 0.0001250000059371814.
+79/79 - 30s - 383ms/step - accuracy: 0.8460 - loss: 0.4756 - val_accuracy: 0.7574 - val_loss: 0.7875 - learning_rate: 2.5000e-04
+Epoch 39/120
+
+Epoch 39: val_loss did not improve from 0.56701
+79/79 - 31s - 394ms/step - accuracy: 0.8381 - loss: 0.4773 - val_accuracy: 0.7426 - val_loss: 0.8783 - learning_rate: 1.2500e-04
+Epoch 40/120
+
+Epoch 40: val_loss did not improve from 0.56701
+79/79 - 33s - 413ms/step - accuracy: 0.8544 - loss: 0.4495 - val_accuracy: 0.5662 - val_loss: 1.7480 - learning_rate: 1.2500e-04
+Epoch 41/120
+
+Epoch 41: val_loss did not improve from 0.56701
+79/79 - 33s - 414ms/step - accuracy: 0.8504 - loss: 0.4436 - val_accuracy: 0.7426 - val_loss: 0.9764 - learning_rate: 1.2500e-04
+Epoch 42/120
+
+Epoch 42: val_loss did not improve from 0.56701
+79/79 - 1290s - 16s/step - accuracy: 0.8571 - loss: 0.4541 - val_accuracy: 0.6471 - val_loss: 0.9949 - learning_rate: 1.2500e-04
+Epoch 43/120
+
+Epoch 43: val_loss did not improve from 0.56701
+79/79 - 37s - 467ms/step - accuracy: 0.8623 - loss: 0.4519 - val_accuracy: 0.6250 - val_loss: 1.2788 - learning_rate: 1.2500e-04
+Epoch 44/120
+
+Epoch 44: val_loss did not improve from 0.56701
+79/79 - 27s - 343ms/step - accuracy: 0.8540 - loss: 0.4386 - val_accuracy: 0.6397 - val_loss: 1.1811 - learning_rate: 1.2500e-04
+Epoch 45/120
+
+Epoch 45: val_loss improved from 0.56701 to 0.52327, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 45: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 337s - 4s/step - accuracy: 0.8548 - loss: 0.4358 - val_accuracy: 0.7794 - val_loss: 0.5233 - learning_rate: 1.2500e-04
+Epoch 46/120
+
+Epoch 46: val_loss did not improve from 0.52327
+79/79 - 27s - 343ms/step - accuracy: 0.8671 - loss: 0.4209 - val_accuracy: 0.6397 - val_loss: 1.3036 - learning_rate: 1.2500e-04
+Epoch 47/120
+
+Epoch 47: val_loss did not improve from 0.52327
+79/79 - 26s - 330ms/step - accuracy: 0.8611 - loss: 0.4281 - val_accuracy: 0.8235 - val_loss: 0.6263 - learning_rate: 1.2500e-04
+Epoch 48/120
+
+Epoch 48: val_loss did not improve from 0.52327
+79/79 - 29s - 373ms/step - accuracy: 0.8583 - loss: 0.4347 - val_accuracy: 0.6838 - val_loss: 1.0932 - learning_rate: 1.2500e-04
+Epoch 49/120
+
+Epoch 49: val_loss did not improve from 0.52327
+79/79 - 36s - 453ms/step - accuracy: 0.8782 - loss: 0.3996 - val_accuracy: 0.5735 - val_loss: 1.2058 - learning_rate: 1.2500e-04
+Epoch 50/120
+
+Epoch 50: val_loss did not improve from 0.52327
+79/79 - 36s - 457ms/step - accuracy: 0.8571 - loss: 0.4145 - val_accuracy: 0.6544 - val_loss: 1.2252 - learning_rate: 1.2500e-04
+Epoch 51/120
+
+Epoch 51: val_loss did not improve from 0.52327
+79/79 - 785s - 10s/step - accuracy: 0.8766 - loss: 0.3938 - val_accuracy: 0.6985 - val_loss: 1.0670 - learning_rate: 1.2500e-04
+Epoch 52/120
+
+Epoch 52: val_loss improved from 0.52327 to 0.31960, saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+
+Epoch 52: finished saving model to C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.keras
+79/79 - 515s - 7s/step - accuracy: 0.8675 - loss: 0.4168 - val_accuracy: 0.8750 - val_loss: 0.3196 - learning_rate: 1.2500e-04
+Epoch 53/120
+
+Epoch 53: val_loss did not improve from 0.31960
+79/79 - 29s - 367ms/step - accuracy: 0.8675 - loss: 0.4001 - val_accuracy: 0.7500 - val_loss: 1.0604 - learning_rate: 1.2500e-04
+Epoch 54/120
+
+Epoch 54: val_loss did not improve from 0.31960
+79/79 - 111s - 1s/step - accuracy: 0.8710 - loss: 0.3938 - val_accuracy: 0.8676 - val_loss: 0.3303 - learning_rate: 1.2500e-04
+Epoch 55/120
+
+Epoch 55: val_loss did not improve from 0.31960
+79/79 - 114s - 1s/step - accuracy: 0.8798 - loss: 0.3835 - val_accuracy: 0.7059 - val_loss: 1.3482 - learning_rate: 1.2500e-04
+Epoch 56/120
+
+Epoch 56: val_loss did not improve from 0.31960
+79/79 - 4085s - 52s/step - accuracy: 0.8754 - loss: 0.3856 - val_accuracy: 0.7426 - val_loss: 0.9713 - learning_rate: 1.2500e-04
+Epoch 57/120
+
+Epoch 57: val_loss did not improve from 0.31960
+79/79 - 714s - 9s/step - accuracy: 0.8698 - loss: 0.4054 - val_accuracy: 0.4412 - val_loss: 2.4239 - learning_rate: 1.2500e-04
+Epoch 58/120
+
+Epoch 58: val_loss did not improve from 0.31960
+79/79 - 175s - 2s/step - accuracy: 0.8726 - loss: 0.3769 - val_accuracy: 0.7721 - val_loss: 0.7676 - learning_rate: 1.2500e-04
+Epoch 59/120
+
+Epoch 59: val_loss did not improve from 0.31960
+
+Epoch 59: ReduceLROnPlateau reducing learning rate to 6.25000029685907e-05.
+79/79 - 114s - 1s/step - accuracy: 0.8766 - loss: 0.3807 - val_accuracy: 0.8162 - val_loss: 0.6058 - learning_rate: 1.2500e-04
+Epoch 60/120
+
+Epoch 60: val_loss did not improve from 0.31960
+79/79 - 112s - 1s/step - accuracy: 0.8798 - loss: 0.3730 - val_accuracy: 0.7206 - val_loss: 0.9152 - learning_rate: 6.2500e-05
+Epoch 61/120
+
+Epoch 61: val_loss did not improve from 0.31960
+79/79 - 144s - 2s/step - accuracy: 0.8750 - loss: 0.3919 - val_accuracy: 0.8603 - val_loss: 0.4696 - learning_rate: 6.2500e-05
+Epoch 62/120
+
+Epoch 62: val_loss did not improve from 0.31960
+79/79 - 141s - 2s/step - accuracy: 0.8730 - loss: 0.3680 - val_accuracy: 0.6397 - val_loss: 1.0517 - learning_rate: 6.2500e-05
+Epoch 63/120
+
+Epoch 63: val_loss did not improve from 0.31960
+79/79 - 100s - 1s/step - accuracy: 0.8841 - loss: 0.3570 - val_accuracy: 0.7206 - val_loss: 0.8547 - learning_rate: 6.2500e-05
+Epoch 64/120
+
+Epoch 64: val_loss did not improve from 0.31960
+79/79 - 101s - 1s/step - accuracy: 0.8881 - loss: 0.3472 - val_accuracy: 0.7574 - val_loss: 0.7688 - learning_rate: 6.2500e-05
+Epoch 65/120
+
+Epoch 65: val_loss did not improve from 0.31960
+79/79 - 101s - 1s/step - accuracy: 0.8825 - loss: 0.3675 - val_accuracy: 0.7794 - val_loss: 0.6996 - learning_rate: 6.2500e-05
+Epoch 66/120
+
+Epoch 66: val_loss did not improve from 0.31960
+
+Epoch 66: ReduceLROnPlateau reducing learning rate to 3.125000148429535e-05.
+79/79 - 100s - 1s/step - accuracy: 0.8849 - loss: 0.3636 - val_accuracy: 0.8015 - val_loss: 0.7589 - learning_rate: 6.2500e-05
+Epoch 67/120
+
+Epoch 67: val_loss did not improve from 0.31960
+79/79 - 101s - 1s/step - accuracy: 0.8869 - loss: 0.3587 - val_accuracy: 0.7721 - val_loss: 0.7191 - learning_rate: 3.1250e-05
+Epoch 68/120
+
+Epoch 68: val_loss did not improve from 0.31960
+79/79 - 96s - 1s/step - accuracy: 0.8782 - loss: 0.3602 - val_accuracy: 0.7868 - val_loss: 0.7285 - learning_rate: 3.1250e-05
+Epoch 69/120
+
+Epoch 69: val_loss did not improve from 0.31960
+79/79 - 149s - 2s/step - accuracy: 0.8841 - loss: 0.3595 - val_accuracy: 0.8015 - val_loss: 0.6548 - learning_rate: 3.1250e-05
+Epoch 70/120
+
+Epoch 70: val_loss did not improve from 0.31960
+79/79 - 143s - 2s/step - accuracy: 0.8873 - loss: 0.3539 - val_accuracy: 0.7868 - val_loss: 0.8037 - learning_rate: 3.1250e-05
+Epoch 71/120
+
+Epoch 71: val_loss did not improve from 0.31960
+79/79 - 142s - 2s/step - accuracy: 0.8853 - loss: 0.3566 - val_accuracy: 0.7426 - val_loss: 0.9079 - learning_rate: 3.1250e-05
+Epoch 72/120
+
+Epoch 72: val_loss did not improve from 0.31960
+79/79 - 146s - 2s/step - accuracy: 0.8837 - loss: 0.3546 - val_accuracy: 0.8088 - val_loss: 0.6352 - learning_rate: 3.1250e-05
+Epoch 72: early stopping
+Restoring model weights from the end of the best epoch: 52.
+      Entrenamiento finalizado en 13360.0s
+      Historial guardado en C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\training_history.json
+
+[4/5] Evaluacion final ...
+
+=== train ===  n=2520  accuracy=0.9286
+              precision    recall  f1-score   support
+
+       APAGA       0.97      0.94      0.95       404
+   CERRADURA       0.92      0.97      0.95       404
+    ENCIENDE       0.81      1.00      0.90       400
+         LUZ       0.93      1.00      0.96       400
+       PANEL       1.00      0.78      0.88       400
+       RUIDO       0.92      0.98      0.95       112
+  VENTILADOR       0.99      0.87      0.92       400
+
+    accuracy                           0.93      2520
+   macro avg       0.93      0.93      0.93      2520
+weighted avg       0.94      0.93      0.93      2520
+
+
+=== val ===  n=136  accuracy=0.8750
+              precision    recall  f1-score   support
+
+       APAGA       1.00      0.76      0.86        21
+   CERRADURA       0.84      1.00      0.91        21
+    ENCIENDE       0.65      1.00      0.79        22
+         LUZ       0.96      1.00      0.98        22
+       PANEL       1.00      0.64      0.78        22
+       RUIDO       1.00      0.83      0.91         6
+  VENTILADOR       1.00      0.86      0.93        22
+
+    accuracy                           0.88       136
+   macro avg       0.92      0.87      0.88       136
+weighted avg       0.91      0.88      0.88       136
+
+
+=== test ===  n=136  accuracy=0.9265
+              precision    recall  f1-score   support
+
+       APAGA       0.95      0.95      0.95        21
+   CERRADURA       1.00      0.95      0.98        22
+    ENCIENDE       0.81      1.00      0.89        21
+         LUZ       0.92      1.00      0.96        22
+       PANEL       1.00      0.77      0.87        22
+       RUIDO       1.00      0.83      0.91         6
+  VENTILADOR       0.91      0.91      0.91        22
+
+    accuracy                           0.93       136
+   macro avg       0.94      0.92      0.92       136
+weighted avg       0.93      0.93      0.93       136
+
+
+[5/5] Exportando TFLite ...
+Saved artifact at 'C:\Users\derec\AppData\Local\Temp\tmpp99x9ice'. The following endpoints are available:
+
+* Endpoint 'serve'
+  args_0 (POSITIONAL_ONLY): TensorSpec(shape=(None, 120, 151), dtype=tf.float32, name='mfcc_input')
+Output Type:
+  TensorSpec(shape=(None, 7), dtype=tf.float32, name=None)
+Captures:
+  2483600700432: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701392: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600700816: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701200: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600700048: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701008: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701776: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702736: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702352: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702160: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701584: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702544: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600703120: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600698512: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601916176: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601916368: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600703312: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702928: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918480: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601919440: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918864: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918672: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601917520: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601919056: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601920592: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601921552: TensorSpec(shape=(), dtype=tf.resource, name=None)
+W0000 00:00:1778649434.082422   14556 tf_tfl_flatbuffer_helpers.cc:364] Ignored output_format.
+W0000 00:00:1778649434.086133   14556 tf_tfl_flatbuffer_helpers.cc:367] Ignored drop_control_dependency.
+I0000 00:00:1778649434.102639   14556 reader.cc:83] Reading SavedModel from: C:\Users\derec\AppData\Local\Temp\tmpp99x9ice
+I0000 00:00:1778649434.109190   14556 reader.cc:52] Reading meta graph with tags { serve }
+I0000 00:00:1778649434.109633   14556 reader.cc:147] Reading SavedModel debug info (if present) from: C:\Users\derec\AppData\Local\Temp\tmpp99x9ice
+I0000 00:00:1778649434.155641   14556 mlir_graph_optimization_pass.cc:437] MLIR V1 optimization pass is not enabled
+I0000 00:00:1778649434.163987   14556 loader.cc:236] Restoring SavedModel bundle.
+I0000 00:00:1778649434.531253   14556 loader.cc:220] Running initialization op on SavedModel bundle at path: C:\Users\derec\AppData\Local\Temp\tmpp99x9ice
+I0000 00:00:1778649434.608938   14556 loader.cc:471] SavedModel load for tags { serve }; Status: success: OK. Took 507412 microseconds.
+I0000 00:00:1778649434.812188   14556 dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+      Float32 -> C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base.tflite  (242.3 KB)
+Saved artifact at 'C:\Users\derec\AppData\Local\Temp\tmpr4rzb585'. The following endpoints are available:
+
+* Endpoint 'serve'
+  args_0 (POSITIONAL_ONLY): TensorSpec(shape=(None, 120, 151), dtype=tf.float32, name='mfcc_input')
+Output Type:
+  TensorSpec(shape=(None, 7), dtype=tf.float32, name=None)
+Captures:
+  2483600700432: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701392: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600700816: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701200: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600700048: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701008: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701776: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702736: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702352: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702160: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600701584: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702544: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600703120: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600698512: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601916176: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601916368: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600703312: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483600702928: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918480: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601919440: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918864: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601918672: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601917520: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601919056: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601920592: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2483601921552: TensorSpec(shape=(), dtype=tf.resource, name=None)
+C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\.venv\Lib\site-packages\tensorflow\lite\python\convert.py:846: UserWarning: Statistics for quantized inputs were expected, but not specified; continuing anyway.
+  warnings.warn(
+W0000 00:00:1778649438.938789   14556 tf_tfl_flatbuffer_helpers.cc:364] Ignored output_format.
+W0000 00:00:1778649438.939023   14556 tf_tfl_flatbuffer_helpers.cc:367] Ignored drop_control_dependency.
+I0000 00:00:1778649438.940713   14556 reader.cc:83] Reading SavedModel from: C:\Users\derec\AppData\Local\Temp\tmpr4rzb585
+I0000 00:00:1778649438.945057   14556 reader.cc:52] Reading meta graph with tags { serve }
+I0000 00:00:1778649438.945173   14556 reader.cc:147] Reading SavedModel debug info (if present) from: C:\Users\derec\AppData\Local\Temp\tmpr4rzb585
+I0000 00:00:1778649438.990290   14556 loader.cc:236] Restoring SavedModel bundle.
+I0000 00:00:1778649439.295366   14556 loader.cc:220] Running initialization op on SavedModel bundle at path: C:\Users\derec\AppData\Local\Temp\tmpr4rzb585
+I0000 00:00:1778649439.367090   14556 loader.cc:471] SavedModel load for tags { serve }; Status: success: OK. Took 426398 microseconds.
+fully_quantize: 0, inference_type: 6, input_inference_type: INT8, output_inference_type: INT8
+W0000 00:00:1778649445.329565   14556 flatbuffer_export.cc:3851] Skipping runtime version metadata in the model. This will be generated by the exporter.
+      INT8    -> C:\Landivar\semestre7\Inteligencia artificial\ProyectoFinal_IA\models\cnn_voz_base_int8.tflite  (72.2 KB)
+
+Listo.

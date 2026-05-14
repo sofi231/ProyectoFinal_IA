@@ -204,3 +204,92 @@ Archivo paralelo al `.npz` con **un registro por fila** de cada split:
 | Augmentation | 4 técnicas, solo en train | Time shift, pitch ±2 semitonos, ruido SNR 5–20 dB, SpecAugment |
 
 ---
+
+### Exports
+
+| Archivo | Tamaño | Uso |
+|---|---|---|
+| `models/cnn_voz_base.keras` | 807 KB | Inferencia con TensorFlow / Keras |
+| `models/cnn_voz_base.tflite` | 242 KB | Inferencia float32 con TFLite (PC o Raspberry Pi) |
+| `models/cnn_voz_base_int8.tflite` | 72 KB | Cuantizado INT8 para microcontroladores (ESP32, TFLite Micro) |
+
+Todos los artefactos auxiliares — `training_history.json`, `training_report.json`, `confusion_matrix.npy`, `training_curves.png`, `confusion_matrix.png`, `model_summary.txt` — se generan junto con el modelo en cada corrida.
+
+### Cómo reproducir
+
+```bash
+# 1. Pipeline de features
+python -m src.build_dataset
+
+# 2. Entrenamiento (≈ 70 minutos en CPU con esta config)
+python -m src.train
+
+# 3. Visualización de curvas y matriz (genera PNG en models/)
+python -m src.train --help     # opciones disponibles
+```
+
+---
+
+## Inferencia en tiempo real
+
+Pipeline streaming desde micrófono: captura → ring buffer → VAD por energía → segmentación → MFCC → inferencia → decisión (`src/realtime.py`).
+
+### Uso
+
+```bash
+# Listar dispositivos de entrada
+python -m src.realtime --list-devices
+
+# Inferencia con TFLite (recomendado, más rápido)
+python -m src.realtime
+
+# Forzar Keras (.keras)
+python -m src.realtime --model models/cnn_voz_base.keras
+
+# Cuantizado INT8 para perfiles tipo microcontrolador
+python -m src.realtime --model models/cnn_voz_base_int8.tflite
+
+# Elegir micrófono específico y umbral VAD manual
+python -m src.realtime --device 1 --threshold 0.02
+```
+
+### Cómo funciona el VAD streaming
+
+1. **Calibración**: al arrancar, captura 1 s de silencio y mide RMS de fondo. Umbral = RMS × 4 (configurable con `--threshold-factor`).
+2. **Estado IDLE**: mantiene un *pre-roll* de 200 ms en un buffer circular para no perder el inicio del fonema.
+3. **Transición a ACTIVO**: cuando ≥ N frames consecutivos superan el umbral (mínimo 200 ms de habla).
+4. **Estado ACTIVO**: acumula samples del segmento.
+5. **Transición a IDLE**: cuando ≥ 400 ms de silencio o el segmento llega a 2 s (corte de seguridad).
+6. **Inferencia**: segmento → peak-normalize → padding/recorte a 1.5 s → MFCC → TFLite → softmax.
+7. **Decisión**:
+   - Si `confidence < 0.50` → ignorado (umbral configurable con `--confidence-min`).
+   - Si `label == "RUIDO"` → ignorado (rechazo explícito).
+   - En cualquier otro caso → ejecutar acción (printa `[ACCION: LUZ]`, etc.).
+
+### Latencia medida (CPU, sin micrófono)
+
+Benchmark con 30 inferencias sobre clips sintéticos de 1.5 s:
+
+| Backend | Features (p95) | Inferencia (p95) | **Total (p95)** | Margen vs 500 ms |
+|---|---|---|---|---|
+| Keras (`.keras`) | 21 ms | 301 ms | 323 ms | 177 ms |
+| TFLite float32 | 20 ms | 15 ms | **32 ms** | **468 ms** |
+| TFLite INT8 | 21 ms | 7 ms | **25 ms** | **475 ms** |
+
+Sobre 20 muestras reales del test: **20/20 aciertos** en los tres backends. El TFLite produce idénticas predicciones que Keras pero ≈10× más rápido.
+
+### Salida típica
+
+```
+Cargando modelo cnn_voz_base.tflite ...
+  backend: TFLite
+[calibracion] mantenga silencio durante 1.0 s ...
+[calibracion] ruido RMS=0.00321  umbral=0.01284
+
+Escuchando en device=None  sr=16000 Hz  umbral=0.01284
+Habla un comando. Ctrl+C para salir.
+
+  -> ENCIENDE     conf=0.97 ******************    dur=820ms  feat=18.2ms  inf=12.4ms  total=30.6ms  [ACCION: ENCIENDE]
+  -> LUZ          conf=0.94 ******************    dur=540ms  feat=17.1ms  inf=11.8ms  total=28.9ms  [ACCION: LUZ]
+  -> RUIDO        conf=0.81 ****************      dur=910ms  feat=18.4ms  inf=12.0ms  total=30.4ms  [ignorado: rechazo]
+```

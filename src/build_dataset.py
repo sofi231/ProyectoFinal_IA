@@ -39,7 +39,7 @@ from .augmentation import augment_waveform, spec_augment
 
 
 FILENAME_RE = re.compile(
-    r"^(?P<label>[A-Z_]+?)_(?P<speaker>[A-Za-z0-9]+)_(?P<idx>\d+)_(?P<env>silencio|ruido|ambiente|habla)\.wav$",
+    r"^(?P<label>[A-Z]+)_(?P<speaker>.+?)_(?P<idx>\d+)_(?P<env>silencio|ruido|ambiente|habla)\.wav$",
     re.IGNORECASE,
 )
 
