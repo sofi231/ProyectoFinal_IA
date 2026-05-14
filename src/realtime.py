@@ -25,6 +25,7 @@ Uso:
 from __future__ import annotations
 import argparse
 import queue
+import serial
 import sys
 import time
 from collections import deque
@@ -138,6 +139,14 @@ class RealtimeRecognizer:
         self.min_threshold = min_threshold
         self.confidence_min = confidence_min
 
+        # Iniciar conexión con Arduino
+        try:
+            self.arduino = serial.Serial('COM9', 9600, timeout=1) 
+            print("Conectado al Arduino exitosamente.")
+        except serial.SerialException:
+            print("Advertencia: No se pudo conectar al Arduino. Ejecutando solo en consola.")
+            self.arduino = None
+
         # Estado
         self._q: queue.Queue[np.ndarray] = queue.Queue()
         self._tail = np.zeros(self.frame_len, dtype=np.float32)
@@ -158,12 +167,29 @@ class RealtimeRecognizer:
         """Captura ruido de fondo y devuelve un umbral RMS recomendado."""
         if self.threshold is not None:
             print(f"[calibracion] umbral fijo configurado: {self.threshold:.4f}")
+            self._channels = 1 # fallback asumido
             return self.threshold
         print(f"[calibracion] mantenga silencio durante {seconds:.1f} s ...")
-        rec = sd.rec(int(seconds * self.sr), samplerate=self.sr, channels=1,
-                     dtype="float32", device=self.device)
-        sd.wait()
-        y = rec.flatten()
+        
+        # Estrategia de fallback robusta para Windows y Bluetooth
+        try:
+            self._channels = 1
+            rec = sd.rec(int(seconds * self.sr), samplerate=self.sr, channels=self._channels,
+                         dtype="float32", device=self.device)
+            sd.wait()
+        except Exception as e:
+            print(f"[info] Fallo con 1 canal ({e}), intentando con 2 canales...")
+            self._channels = 2
+            rec = sd.rec(int(seconds * self.sr), samplerate=self.sr, channels=self._channels,
+                         dtype="float32", device=self.device)
+            sd.wait()
+            
+        # Tomar solo el primer canal si hay múltiples
+        if rec.ndim > 1 and rec.shape[1] > 1:
+            y = rec[:, 0].flatten()
+        else:
+            y = rec.flatten()
+            
         rms = float(np.sqrt(np.mean(y ** 2) + 1e-12))
         thr = max(rms * self.threshold_factor, self.min_threshold)
         print(f"[calibracion] ruido RMS={rms:.5f}  umbral={thr:.5f}")
@@ -174,7 +200,7 @@ class RealtimeRecognizer:
     def _callback(self, indata, frames, time_info, status) -> None:
         if status:
             print(f"[sd warning] {status}", file=sys.stderr)
-        # mono float32
+        # Tomar solo el primer canal por si la entrada es stereo/multicanal
         block = indata[:, 0].astype(np.float32).copy()
         self._q.put(block)
 
@@ -220,7 +246,7 @@ class RealtimeRecognizer:
 
         with sd.InputStream(
             samplerate=self.sr,
-            channels=1,
+            channels=getattr(self, '_channels', 1),
             dtype="float32",
             device=self.device,
             blocksize=self.block_samples,
@@ -298,6 +324,12 @@ class RealtimeRecognizer:
             return "[ignorado: baja confianza]"
         if label == "RUIDO":
             return "[ignorado: rechazo]"
+
+        # Enviar el comando al Arduino
+        if hasattr(self, 'arduino') and self.arduino is not None:
+            comando_codificado = (label + '\n').encode('utf-8')
+            self.arduino.write(comando_codificado)
+
         return f"[ACCION: {label}]"
 
 
