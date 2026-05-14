@@ -205,79 +205,6 @@ Archivo paralelo al `.npz` con **un registro por fila** de cada split:
 
 ---
 
-## Modelo base — CNN sobre MFCC
-
-### Arquitectura (`src/model.py`)
-
-CNN 2D que trata la matriz MFCC como imagen tiempo × frecuencia.
-
-```
-mfcc_input (120, 151)
-  → Reshape (120, 151, 1)
-  → Conv2D(32) + BN + ReLU + MaxPool(2,2) + Dropout(0.15)
-  → Conv2D(64) + BN + ReLU + MaxPool(2,2) + Dropout(0.25)
-  → Conv2D(64) + BN + ReLU + MaxPool(2,2) + Dropout(0.35)
-  → GlobalAveragePooling2D
-  → Dense(64) + BN + ReLU + Dropout(0.45)
-  → Dense(7, softmax)
-```
-
-**Total: 61 255 parámetros** (≈ 240 KB en float32).
-
-| Decisión | Justificación |
-|---|---|
-| Conv2D vs Conv1D | Aprovecha estructura 2D del MFCC; convoluciones espaciales detectan patrones tiempo-frecuencia conjuntos |
-| BatchNorm en todas las capas | Estabiliza entrenamiento con dataset pequeño; aporta cierta regularización |
-| GlobalAveragePooling2D | Reduce drásticamente parámetros vs Flatten → menos overfitting |
-| L2 = 1e-4 + dropout escalonado | Sin regularización el modelo memorizaba (gap train-val de 50 pts); con esto el gap baja a 4 pts |
-| LR inicial 5e-4 + Reduce on plateau | LR=1e-3 producía oscilación violenta en val; bajar a 5e-4 estabiliza |
-| Class weights balanceados | RUIDO solo tiene 40 muestras vs 144 de los demás; sin esto, el modelo ignora RUIDO |
-
-### Entrenamiento (`src/train.py`)
-
-- **Optimizador**: Adam, lr 5e-4 → 2.5e-4 → 1.25e-4 → 6.25e-5 → 3.125e-5 (ReduceLROnPlateau, paciencia 7).
-- **EarlyStopping** sobre val_loss, paciencia 20, restaura el mejor checkpoint.
-- **Loss**: SparseCategoricalCrossentropy.
-- **Batch**: 32. **Epochs**: hasta 120 (con corte temprano).
-- **Class weights**: balanceados (sklearn estilo `balanced`).
-
-### Resultados (corpus de 902 muestras, 7 hablantes)
-
-| Split | n | Accuracy | F1 macro |
-|---|---|---|---|
-| Train | 2520 (con aug) | **0.929** | 0.930 |
-| Val | 136 | **0.875** | 0.879 |
-| **Test** | **136** | **0.927** | **0.924** |
-
-**Per-class TEST**:
-
-| Clase | Precision | Recall | F1 | n |
-|---|---|---|---|---|
-| APAGA | 0.952 | 0.952 | 0.952 | 21 |
-| CERRADURA | 1.000 | 0.955 | 0.977 | 22 |
-| ENCIENDE | 0.808 | 1.000 | 0.894 | 21 |
-| LUZ | 0.917 | 1.000 | 0.957 | 22 |
-| PANEL | 1.000 | 0.773 | 0.872 | 22 |
-| RUIDO | 1.000 | 0.833 | 0.909 | 6 |
-| VENTILADOR | 0.909 | 0.909 | 0.909 | 22 |
-
-**Comparativa con baseline anterior** (137 muestras, 1 hablante):
-
-| | Baseline | Final |
-|---|---|---|
-| Muestras crudas | 137 | 902 |
-| Hablantes | 1 (`dereck`) | 7 (incluye 5 voluntarios externos) |
-| Test accuracy | 0.519 | **0.927** |
-| F1 macro test | 0.476 | **0.924** |
-| RUIDO F1 | 0.000 | 0.909 |
-| VENTILADOR F1 | 0.000 | 0.909 |
-
-**Errores observados** (10/136 en test):
-- `PANEL → ENCIENDE/LUZ` (5 casos): el modelo confunde palabras con cadencia similar.
-- `VENTILADOR → ENCIENDE` (2 casos): ambas son palabras largas que terminan en vocal.
-- `APAGA → ENCIENDE` (1) y `CERRADURA → VENTILADOR` (1).
-- `RUIDO → APAGA` (1): muestra de ruido con ráfaga energética.
-
 ### Exports
 
 | Archivo | Tamaño | Uso |
@@ -351,8 +278,6 @@ Benchmark con 30 inferencias sobre clips sintéticos de 1.5 s:
 
 Sobre 20 muestras reales del test: **20/20 aciertos** en los tres backends. El TFLite produce idénticas predicciones que Keras pero ≈10× más rápido.
 
-> El PDF exige < 500 ms end-to-end. Con TFLite + VAD el sistema queda con > 460 ms de margen, suficiente para sumar captura del micrófono y el accionamiento de hardware GPIO/serial.
-
 ### Salida típica
 
 ```
@@ -368,19 +293,3 @@ Habla un comando. Ctrl+C para salir.
   -> LUZ          conf=0.94 ******************    dur=540ms  feat=17.1ms  inf=11.8ms  total=28.9ms  [ACCION: LUZ]
   -> RUIDO        conf=0.81 ****************      dur=910ms  feat=18.4ms  inf=12.0ms  total=30.4ms  [ignorado: rechazo]
 ```
-
-### Hooks de hardware
-
-`RealtimeRecognizer._decide_action()` es el punto de extensión. Para conectar al panel físico (modalidad C):
-
-```python
-def _decide_action(self, label, conf):
-    if conf < self.confidence_min or label == "RUIDO":
-        return "[ignorado]"
-    # Ejemplo: enviar comando por serial al ESP32 del panel
-    import serial
-    self.ser.write(f"{label}\n".encode())
-    return f"[ACCION: {label}]"
-```
-
----
