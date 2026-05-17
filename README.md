@@ -74,7 +74,7 @@ py -3.13 -m venv .venv
 # o CMD
 .venv\Scripts\activate.bat
 # o Git Bash / Linux / macOS
-source .venv/Scripts/activate
+source .venv/bin/activate 
 
 pip install --upgrade pip
 pip install -r requirements.txt

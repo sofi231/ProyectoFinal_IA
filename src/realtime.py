@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import queue
 import serial
+import serial.tools.list_ports 
 import sys
 import time
 from collections import deque
@@ -139,19 +140,39 @@ class RealtimeRecognizer:
         self.min_threshold = min_threshold
         self.confidence_min = confidence_min
 
-        # Iniciar conexión con Arduino
-        try:
-            self.arduino = serial.Serial('COM9', 9600, timeout=1) 
-            print("Conectado al Arduino exitosamente.")
-        except serial.SerialException:
-            print("Advertencia: No se pudo conectar al Arduino. Ejecutando solo en consola.")
-            self.arduino = None
+        # Iniciar conexión con Arduino (auto-detectar puerto)
+        self.arduino = None
+        puerto = self._detectar_arduino()
+        if puerto:
+            try:
+                self.arduino = serial.Serial(puerto, 9600, timeout=1)
+                print(f"Conectado al Arduino en {puerto} exitosamente.")
+            except serial.SerialException as e:
+                print(f"Advertencia: No se pudo conectar al Arduino en {puerto}: {e}")
+                print("Ejecutando solo en consola.")
+        else:
+            print("Advertencia: No se detectó Arduino. Ejecutando solo en consola.")
 
         # Estado
         self._q: queue.Queue[np.ndarray] = queue.Queue()
         self._tail = np.zeros(self.frame_len, dtype=np.float32)
         self._capture_start_ts: float | None = None
         self._reset_segment()
+
+    @staticmethod
+    #para detectar automaticamente el puerto de arduino
+    def _detectar_arduino() -> str | None:
+        """Auto-detecta el puerto serial del Arduino en cualquier OS."""
+        puertos = serial.tools.list_ports.comports()
+        # Buscar por VID conocidos de Arduino (0x2341) o CH340 (0x1A86)
+        for p in puertos:
+            if p.vid in (0x2341, 0x2A03, 0x1A86, 0x10C4):
+                return p.device
+        # Fallback: primer puerto USB serial disponible
+        for p in puertos:
+            if "usb" in p.device.lower() or "usbmodem" in p.device.lower():
+                return p.device
+        return None
 
     def _reset_segment(self) -> None:
         self._pre_roll = deque(maxlen=self.pre_roll_samples)
@@ -309,6 +330,15 @@ class RealtimeRecognizer:
 
     # --- Reporte por deteccion ---
     def _emit(self, segment: np.ndarray, capture_ms: float) -> None:
+        
+        # debug de audios
+        import scipy.io.wavfile as wav
+        import os
+        os.makedirs("debug_audios", exist_ok=True)
+        timestamp = int(time.time() * 1000)
+        out_path = f"debug_audios/{timestamp}_dur{int(len(segment)/self.sr*1000)}ms.wav"
+        wav.write(out_path, self.sr, (segment * 32767).astype(np.int16))
+        
         out = self._infer(segment)
         bar = "*" * int(out["confidence"] * 20)
         action = self._decide_action(out["label"], out["confidence"])
